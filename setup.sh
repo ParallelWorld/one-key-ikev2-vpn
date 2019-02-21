@@ -17,7 +17,7 @@ systemctl restart firewalld.service
 bash ~/.acme.sh/acme.sh  --issue -d $HOST --standalone
 
 # 证书更新时自动copy证书
-bash ~/.acme.sh/acme.sh acme.sh  --installcert  -d $HOST  \
+bash ~/.acme.sh/acme.sh  --installcert  -d $HOST  \
         --cert-file /root/server.cert.pem \
         --key-file   /root/server.pem \
         --fullchain-file /root/ca.cert.pem
