@@ -7,7 +7,7 @@ USER_PASS=$3
 
 curl  https://get.acme.sh | sh
 alias acme.sh=~/.acme.sh/acme.sh
-yum install socat
+yum -y install socat
 
 
 # 打开80和443端口
@@ -17,6 +17,12 @@ systemctl restart firewalld.service
 
 # 生成证书
 acme.sh  --issue -d $HOST --standalone
+
+# 证书更新时自动copy证书
+acme.sh  --installcert  -d $HOST  \
+        --cert-file /root/server.cert.pem \
+        --key-file   /root/server.pem \
+        --fullchain-file /root/ca.cert.pem
 
 # 下载VPN部署脚本
 wget --no-check-certificate https://raw.githubusercontent.com/ParallelWorld/one-key-ikev2-vpn/master/one-key-ikev2.sh
