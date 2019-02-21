@@ -23,6 +23,6 @@ bash ~/.acme.sh/acme.sh acme.sh  --installcert  -d $HOST  \
         --fullchain-file /root/ca.cert.pem
 
 # 下载VPN部署脚本
-wget --no-check-certificate https://raw.githubusercontent.com/ParallelWorld/one-key-ikev2-vpn/master/one-key-ikev2.sh
-chmod +x one-key-ikev2.sh
-bash one-key-ikev2.sh $HOST $USER_NAME $USER_PASS
+#wget --no-check-certificate https://raw.githubusercontent.com/ParallelWorld/one-key-ikev2-vpn/master/one-key-ikev2.sh
+#chmod +x one-key-ikev2.sh
+#bash one-key-ikev2.sh $HOST $USER_NAME $USER_PASS
