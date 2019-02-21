@@ -10,6 +10,9 @@ export PATH
 
 clear
 VER=1.2.0
+HOST=$1
+USER_NAME=$2
+USER_PASS=$3
 echo "#############################################################"
 echo "# Install IKEV2 VPN for CentOS6.x/7 (32bit/64bit) or Ubuntu or Debian7/8.*"
 echo "# Intro: https://quericy.me/blog/699"
@@ -17,6 +20,9 @@ echo "#"
 echo "# Author:quericy"
 echo "#"
 echo "# Version:$VER"
+echo "# Host:$HOST"
+echo "# UserName:$USER_NAME"
+echo "# UserPass:$USER_PASS"
 echo "#############################################################"
 echo ""
 
@@ -137,48 +143,52 @@ function pre_install(){
     echo "#"
     echo "# Version:$VER"
     echo "#############################################################"
-    echo "please choose the type of your VPS(Xen、KVM: 1  ,  OpenVZ: 2):"
-    read -p "your choice(1 or 2):" os_choice
-    if [ "$os_choice" = "1" ]; then
-        os="1"
-        os_str="Xen、KVM"
-        else
-            if [ "$os_choice" = "2" ]; then
-                os="2"
-                os_str="OpenVZ"
-                else
-                echo "wrong choice!"
-                exit 1
-            fi
-    fi
+    os="1"
+    os_str="Xen、KVM"
+#    echo "please choose the type of your VPS(Xen、KVM: 1  ,  OpenVZ: 2):"
+#    read -p "your choice(1 or 2):" os_choice
+#    if [ "$os_choice" = "1" ]; then
+#        os="1"
+#        os_str="Xen、KVM"
+#        else
+#            if [ "$os_choice" = "2" ]; then
+#                os="2"
+#                os_str="OpenVZ"
+#                else
+#                echo "wrong choice!"
+#                exit 1
+#            fi
+#    fi
     echo "please input the ip (or domain) of your VPS:"
-    read -p "ip or domain(default_value:${IP}):" vps_ip
-    if [ "$vps_ip" = "" ]; then
-        vps_ip=$IP
-    fi
+    vps_ip=$HOST
+#    read -p "ip or domain(default_value:${IP}):" vps_ip
+#    if [ "$vps_ip" = "" ]; then
+#        vps_ip=$IP
+#    fi
 
     echo "Would you want to import existing cert? You NEED copy your cert file to the same directory of this script"
-    read -p "yes or no?(default_value:no):" have_cert
-    if [ "$have_cert" = "yes" ]; then
-        have_cert="1"
-    else
-        have_cert="0"
-        echo "please input the cert country(C):"
-        read -p "C(default value:com):" my_cert_c
-        if [ "$my_cert_c" = "" ]; then
-            my_cert_c="com"
-        fi
-        echo "please input the cert organization(O):"
-        read -p "O(default value:myvpn):" my_cert_o
-        if [ "$my_cert_o" = "" ]; then
-            my_cert_o="myvpn"
-        fi
-        echo "please input the cert common name(CN):"
-        read -p "CN(default value:VPN CA):" my_cert_cn
-        if [ "$my_cert_cn" = "" ]; then
-            my_cert_cn="VPN CA"
-        fi
-    fi
+    have_cert="1"
+#    read -p "yes or no?(default_value:no):" have_cert
+#    if [ "$have_cert" = "yes" ]; then
+#        have_cert="1"
+#    else
+#        have_cert="0"
+#        echo "please input the cert country(C):"
+#        read -p "C(default value:com):" my_cert_c
+#        if [ "$my_cert_c" = "" ]; then
+#            my_cert_c="com"
+#        fi
+#        echo "please input the cert organization(O):"
+#        read -p "O(default value:myvpn):" my_cert_o
+#        if [ "$my_cert_o" = "" ]; then
+#            my_cert_o="myvpn"
+#        fi
+#        echo "please input the cert common name(CN):"
+#        read -p "CN(default value:VPN CA):" my_cert_cn
+#        if [ "$my_cert_cn" = "" ]; then
+#            my_cert_cn="VPN CA"
+#        fi
+#    fi
 
     echo "####################################"
     get_char(){
@@ -205,7 +215,7 @@ function pre_install(){
     fi
     echo ""
     echo "Press any key to start...or Press Ctrl+C to cancel"
-    char=`get_char`
+#    char=`get_char`
     #Current folder
     cur_dir=`pwd`
     cd $cur_dir
@@ -435,27 +445,26 @@ EOF
 function configure_secrets(){
     cat > /usr/local/etc/ipsec.secrets<<-EOF
 : RSA server.pem
-: PSK "myPSKkey"
-: XAUTH "myXAUTHPass"
-myUserName %any : EAP "myUserPass"
+$USER_NAME %any : EAP "$USER_PASS"
 EOF
 }
 
 function SNAT_set(){
     echo "Use SNAT could implove the speed,but your server MUST have static ip address."
-    read -p "yes or no?(default_value:no):" use_SNAT
-    if [ "$use_SNAT" = "yes" ]; then
-        use_SNAT_str="1"
-        echo -e "$(__yellow "ip address info:")"
-        ip address | grep inet
-        echo "Some servers has elastic IP (AWS) or mapping IP.In this case,you should input the IP address which is binding in network interface."
-        read -p "static ip or network interface ip (default_value:${IP}):" static_ip
-    if [ "$static_ip" = "" ]; then
-        static_ip=$IP
-    fi
-    else
-        use_SNAT_str="0"
-    fi
+#    read -p "yes or no?(default_value:no):" use_SNAT
+#    if [ "$use_SNAT" = "yes" ]; then
+#        use_SNAT_str="1"
+#        echo -e "$(__yellow "ip address info:")"
+#        ip address | grep inet
+#        echo "Some servers has elastic IP (AWS) or mapping IP.In this case,you should input the IP address which is binding in network interface."
+#        read -p "static ip or network interface ip (default_value:${IP}):" static_ip
+#    if [ "$static_ip" = "" ]; then
+#        static_ip=$IP
+#    fi
+#    else
+#        use_SNAT_str="0"
+#    fi
+    use_SNAT_str="0"
 }
 
 # iptables check
@@ -465,12 +474,13 @@ net.ipv4.ip_forward=1
 EOF
     sysctl --system
     echo "Do you use firewall in CentOS7 instead of iptables?"
-    read -p "yes or no?(default_value:no):" use_firewall
-    if [ "$use_firewall" = "yes" ]; then
-        firewall_set
-    else
-        iptables_set
-    fi
+    firewall_set
+#    read -p "yes or no?(default_value:no):" use_firewall
+#    if [ "$use_firewall" = "yes" ]; then
+#        firewall_set
+#    else
+#        iptables_set
+#    fi
 }
 
 # firewall set in CentOS7
@@ -561,9 +571,8 @@ function success_info(){
     echo -e "# [$(__green "Install Complete")]"
     echo -e "# Version:$VER"
     echo -e "# There is the default login info of your IPSec/IkeV2 VPN Service"
-    echo -e "# UserName:$(__green " myUserName")"
-    echo -e "# PassWord:$(__green " myUserPass")"
-    echo -e "# PSK:$(__green " myPSKkey")"
+    echo -e "# UserName:$(__green " $USER_NAME")"
+    echo -e "# PassWord:$(__green " $USER_PASS")"
     echo -e "# you should change default username and password in$(__green " /usr/local/etc/ipsec.secrets")"
     echo -e "# you cert:$(__green " ${cur_dir}/my_key/ca.cert.pem ")"
     if [ "$have_cert" = "1" ]; then
