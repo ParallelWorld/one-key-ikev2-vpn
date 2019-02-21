@@ -7,6 +7,7 @@ USER_PASS=$3
 
 yum -y install socat
 curl  https://get.acme.sh | sh
+alias acme.sh=~/.acme.sh/acme.sh
 
 # 打开80和443端口
 firewall-cmd --zone=public --add-port=80/tcp --permanent
