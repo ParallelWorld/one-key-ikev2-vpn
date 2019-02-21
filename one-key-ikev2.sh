@@ -214,7 +214,7 @@ function pre_install(){
         echo -e "the cert_info:[$(__green "C=${my_cert_c}, O=${my_cert_o}")]"
     fi
     echo ""
-    echo "Press any key to start...or Press Ctrl+C to cancel"
+#    echo "Press any key to start...or Press Ctrl+C to cancel"
 #    char=`get_char`
     #Current folder
     cur_dir=`pwd`
@@ -445,7 +445,9 @@ EOF
 function configure_secrets(){
     cat > /usr/local/etc/ipsec.secrets<<-EOF
 : RSA server.pem
-$USER_NAME %any : EAP "$USER_PASS"
+: PSK "myPSKkey"
+: XAUTH "myXAUTHPass"
+${USER_NAME} %any : EAP "${USER_PASS}"
 EOF
 }
 
