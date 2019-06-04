@@ -391,7 +391,6 @@ conn ios_ikev2
     esp=aes256-sha256,3des-sha1,aes256-sha1!
     rekey=no
     ikelifetime=30s
-    salifetime=30s
     left=%defaultroute
     leftid=${vps_ip}
     leftsendcert=always
